@@ -3,7 +3,6 @@ package main
 import (
 	// DBを操作するためのライブラリ
 	"database/sql"
-	"fmt"
 
 	// sql3を操作するためのドライバを提供
 	_ "github.com/mattn/go-sqlite3"
@@ -41,6 +40,12 @@ func (user *User) createUser() (err error) {
 
 	cmd := "INSERT INTO users(name, email, pass) values($1, $2, $3) RETURNING id"
 	err = Db.QueryRow(cmd, user.Name, user.Email, user.Pass).Scan(&user.Id)
-	fmt.Println(err)
+	return
+}
+
+// ユーザーの削除
+func (user *User) deleteUser() (err error) {
+	cmd := "DELETE FROM users WHERE id = $1"
+	_, err = Db.Exec(cmd, user.Id)
 	return
 }
