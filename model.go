@@ -49,3 +49,10 @@ func (user *User) deleteUser() (err error) {
 	_, err = Db.Exec(cmd, user.Id)
 	return
 }
+
+// ユーザーの編集
+func (user *User) updateUser() (err error) {
+	cmd := "UPDATE users set name = $1, email = $2, pass = $3 WHERE id = $4"
+	_, err = Db.Exec(cmd, user.Name, user.Email, user.Pass, user.Id)
+	return
+}
