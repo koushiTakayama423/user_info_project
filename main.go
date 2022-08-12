@@ -1,12 +1,11 @@
 package main
 
-import (
-	"fmt"
-	"userInfo/models"
-)
-
 func main() {
-	fmt.Println("Hello World")
-	models.DbConnection()
-	models.Dbtst()
+	var user User
+	user.Name = "tst"
+	user.Email = "tst@tst.co.jp"
+	user.Pass = "1234"
+
+	user.createUser()
+
 }
