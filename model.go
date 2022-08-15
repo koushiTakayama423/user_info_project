@@ -56,3 +56,17 @@ func (user *User) updateUser() (err error) {
 	_, err = Db.Exec(cmd, user.Name, user.Email, user.Pass, user.Id)
 	return
 }
+
+// IDからユーザー取得
+func GetUserById(id int) (user User) {
+	cmd := "SELECT id, name, email FROM users WHERE id = $1"
+	Db.QueryRow(cmd, id).Scan(&user.Id, &user.Name, &user.Email)
+	return
+}
+
+// 名前とパスワードからユーザー取得
+func (user *User) getUser() (reUser User) {
+	cmd := "SELECT id, name, email FROM users WHERE name = $1 AND pass = $2"
+	Db.QueryRow(cmd, user.Name, user.Pass).Scan(&reUser.Id, &reUser.Name, &reUser.Email)
+	return
+}
