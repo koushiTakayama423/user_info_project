@@ -65,8 +65,8 @@ func GetUserById(id int) (user User) {
 }
 
 // 名前とパスワードからユーザー取得
-func (user *User) getUser() (reUser User) {
+func (user *User) getUser() {
 	cmd := "SELECT id, name, email FROM users WHERE name = $1 AND pass = $2"
-	Db.QueryRow(cmd, user.Name, user.Pass).Scan(&reUser.Id, &reUser.Name, &reUser.Email)
+	Db.QueryRow(cmd, user.Name, user.Pass).Scan(&user.Id, &user.Name, &user.Email)
 	return
 }
