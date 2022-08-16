@@ -30,14 +30,6 @@ func init() {
 
 // ユーザーの新規作成
 func (user *User) createUser() (err error) {
-	if user.Name == "" {
-		panic("ユーザー名が空")
-	} else if user.Email == "" {
-		panic("ユーザーメールアドレスが空")
-	} else if user.Pass == "" {
-		panic("ユーザーパスが空")
-	}
-
 	cmd := "INSERT INTO users(name, email, pass) values($1, $2, $3) RETURNING id"
 	err = Db.QueryRow(cmd, user.Name, user.Email, user.Pass).Scan(&user.Id)
 	return
@@ -58,9 +50,9 @@ func (user *User) updateUser() (err error) {
 }
 
 // IDからユーザー取得
-func GetUserById(id int) (user User) {
+func GetUserById(id int) (user User, err error) {
 	cmd := "SELECT id, name, email FROM users WHERE id = $1"
-	Db.QueryRow(cmd, id).Scan(&user.Id, &user.Name, &user.Email)
+	err = Db.QueryRow(cmd, id).Scan(&user.Id, &user.Name, &user.Email)
 	return
 }
 
