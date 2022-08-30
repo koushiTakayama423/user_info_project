@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"path"
 	"strconv"
@@ -13,7 +14,7 @@ func main() {
 		Addr: "127.0.0.1:8080",
 	}
 
-	http.HandleFunc("/users/", handleRequest)
+	http.HandleFunc("/users", handleRequest)
 
 	// サーバーの起動
 	server.ListenAndServe()
@@ -22,6 +23,21 @@ func main() {
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
 	var err error
+
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+
+	fmt.Println(r.Method)
+
+	var user User
+	err = user.readJson(r)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(user)
 
 	switch r.Method {
 	case "GET":
@@ -44,8 +60,11 @@ func requestCreate(w http.ResponseWriter, r *http.Request) (err error) {
 	var user User
 	err = user.readJson(r)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
+
+	fmt.Println(user)
 
 	user.userChecker()
 
@@ -147,6 +166,7 @@ func (user *User) readJson(r *http.Request) (err error) {
 	contentBody := make([]byte, contentLength)
 	// リクエストを格納
 	r.Body.Read(contentBody)
+	fmt.Println(contentBody)
 
 	// jsonの詰め替え
 	err = json.Unmarshal(contentBody, &user)
