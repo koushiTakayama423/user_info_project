@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -28,20 +29,9 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 
-	fmt.Println(r.Method)
-
-	var user User
-	err = user.readJson(r)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Println(user)
-
 	switch r.Method {
 	case "GET":
-		panic("getは未対応")
+		err = errors.New("Getメソッドは未対応")
 	case "POST":
 		err = requestCreate(w, r)
 	case "PUT":
@@ -60,17 +50,18 @@ func requestCreate(w http.ResponseWriter, r *http.Request) (err error) {
 	var user User
 	err = user.readJson(r)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 
-	fmt.Println(user)
-
-	user.userChecker()
+	err = user.userChecker()
+	if err != nil {
+		return
+	}
 
 	// 既に登録されていないか確認
 	user.getUser()
 	if user.Id != 0 {
+		err = errors.New("ユーザーが重複")
 		return
 	}
 
@@ -98,11 +89,15 @@ func requestEdit(w http.ResponseWriter, r *http.Request) (err error) {
 		return
 	}
 
-	user.userChecker()
+	err = user.userChecker()
+	if err != nil {
+		return
+	}
 
 	// 既に登録されていないか確認
 	user.getUser()
 	if user.Id != 0 {
+		err = errors.New("ユーザーが重複")
 		return
 	}
 
@@ -148,14 +143,18 @@ func requestDelete(w http.ResponseWriter, r *http.Request) (err error) {
 }
 
 // ユーザー情報のチェック
-func (user *User) userChecker() {
+func (user *User) userChecker() (err error) {
 	if user.Name == "" {
-		panic("ユーザー名が空")
+		err = errors.New("ユーザー名が空")
+		return
 	} else if user.Email == "" {
-		panic("ユーザーメールアドレスが空")
+		err = errors.New("ユーザーメールアドレスが空")
+		return
 	} else if user.Pass == "" {
-		panic("ユーザーパスが空")
+		err = errors.New("ユーザーパスが空")
+		return
 	}
+	return
 }
 
 // リクエストjsonをuserに格納する
